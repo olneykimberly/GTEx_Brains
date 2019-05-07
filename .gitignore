@@ -1,0 +1,182 @@
+### General file types 
+*.fastq
+*.fastqc
+*.fastq.gz
+*.fastqc.gz
+*.fastq.zip
+*.fastqc.zip
+*.zip
+*.log
+*.json
+*.txt
+*.tsv
+*.out
+*.err
+*.pyc
+*.gtf
+*.md
+*.png
+
+## Random stuff
+GTEx/DifferentialExpression/.RDataTmp
+GTEx/DifferentialExpression/EdgeR_Sex&Tissue.R
+GTEx_Test/
+
+
+### Salmon
+aux_info/
+libParams/
+logs/
+*.sf
+
+### R
+.RData
+.Rhistory
+.RDataTmp
+
+### Snakemake
+*.snakemake/
+aux_info/
+
+### markdown output files
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/GLM_F_Test/Markdown/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/Exact_Test/Exact_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+/scratch/mjpete11/GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Sex_and_Tissue/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Normalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/Exact_Test/Exact_Test_files/
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/GLM_F_Test/GLM_F_Test_files/
+GTEx/DifferentialExpression/EdgeR/Tissue/Gene/Unormalized/GLM_Ratio_Test/GLM_Ratio_Test_files/
+
+
+## QC output file
+GTEx/Amygdala/fastqc_results/
+GTEx/Amygdala/fastqc_trimmed_results/
+GTEx/Amygdala/multiqc_trimmed_results/
+GTEx/Anterior/fastqc_results/
+GTEx/Anterior/fastqc_trimmed_results/
+GTEx/Anterior/multiqc_trimmed_results/
+GTEx/Caudate/fastqc_results/
+GTEx/Caudate/fastqc_trimmed_results/
+GTEx/Caudate/multiqc_trimmed_results/
+GTEx/Cerebellar/fastqc_results/
+GTEx/Cerebellar/fastqc_trimmed_results/
+GTEx/Cerebellar/multiqc_trimmed_results/
+GTEx/Cerebellum/fastqc_results/
+GTEx/Cerebellum/fastqc_trimmed_results/
+GTEx/Cerebellum/multiqc_trimmed_results/
+GTEx/Cortex/fastqc_results/
+GTEx/Cortex/fastqc_trimmed_results/
+GTEx/Cortex/multiqc_trimmed_results/
+GTEx/Frontal_Cortex/fastqc_results/
+GTEx/Frontal_Cortex/fastqc_trimmed_results/
+GTEx/Frontal_Cortex/multiqc_trimmed_results/
+GTEx/Hippocampus/fastqc_results/
+GTEx/Hippocampus/fastqc_trimmed_results/
+GTEx/Hippocampus/multiqc_trimmed_results/
+GTEx/Hypothalamus/fastqc_results/
+GTEx/Hypothalamus/fastqc_trimmed_results/
+GTEx/Hypothalamus/multiqc_trimmed_results/
+GTEx/Nucleus_Accumbens/fastqc_results/
+GTEx/Nucleus_Accumbens/fastqc_trimmed_results/
+GTEx/Nucleus_Accumbens/multiqc_trimmed_results/
+GTEx/Putamen/fastqc_results/
+GTEx/Putamen/fastqc_trimmed_results/
+GTEx/Putamen/multiqc_trimmed_results/
+GTEx/Spinal_Cord/fastqc_results/
+GTEx/Spinal_Cord/fastqc_trimmed_results/
+GTEx/Spinal_Cord/multiqc_trimmed_results/
+GTEx/Substantia_Nigra/fastqc_results/
+GTEx/Substantia_Nigra/fastqc_trimmed_results/
+GTEx/Substantia_Nigra/multiqc_trimmed_results/
+
+### Vim
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
+
+## Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+.venv
+pip-selfcheck.json
+
+### Linux
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+
