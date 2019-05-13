@@ -593,7 +593,7 @@ grid.table(df_Ca.Vs.Hp)
 plotMD(qlf.Ca.Vs.Hp)
 
 # Volcano plot
-volcanoData <- cbind(qlf.Ca.Vs.Hp$table$logFC, -log10(qlf.Ca.Vs.Hp[$table[,"PValue"]))
+volcanoData <- cbind(qlf.Ca.Vs.Hp$table$logFC, -log10(qlf.Ca.Vs.Hp$table[,"PValue"]))
 colnames(volcanoData) <- c("logFC", "negLogPval")
 plot(volcanoData, pch=19, main='Volcano plot: 1*Caudate-1*Hippocampus')
 abline(a=1.30102999566, b=0, col="blue") # Set intercept equal to p = -log10(0.05)
