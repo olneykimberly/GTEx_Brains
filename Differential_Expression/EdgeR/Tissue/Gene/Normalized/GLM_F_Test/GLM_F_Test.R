@@ -149,7 +149,7 @@ abline(v=0, col="red")
 hist(qlf.Am.Vs.At$table[,"PValue"], breaks=50, main="Amygdala vs Anterior p-value frequency histogram")
 
 # Amygdala vs Caduate
-qlf.Am.Vs.Ca <- glmQLFTest(fit, contrast=my.contrast[,"Am.Vs.Ca"])
+qlf.Am.Vs.Ca <- glmQLFTest(fit, contrast=my.contrasts[,"Am.Vs.Ca"])
 df_Am.Vs.Ca <- summary(decideTests(qlf.Am.Vs.Ca))
 grid.newpage()
 grid.table(df_Am.Vs.Ca)
@@ -596,7 +596,7 @@ grid.table(df_Ca.Vs.Hp)
 plotMD(qlf.Ca.Vs.Hp)
 
 # Volcano plot
-volcanoData <- cbind(qlf.Ca.Vs.Hp$table$logFC, -log10(qlf.Ca.Vs.Hp[$table[,"PValue"]))
+volcanoData <- cbind(qlf.Ca.Vs.Hp$table$logFC, -log10(qlf.Ca.Vs.Hp$table[,"PValue"]))
 colnames(volcanoData) <- c("logFC", "negLogPval")
 plot(volcanoData, pch=19, main='Volcano plot: 1*Caudate-1*Hippocampus')
 abline(a=1.30102999566, b=0, col="blue") # Set intercept equal to p = -log10(0.05)
