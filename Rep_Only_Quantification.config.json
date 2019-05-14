@@ -22,7 +22,7 @@
 	},
 
 "Cerebellar_RNA_Trimmed":{
-	"GTEX-RU72": ["GTEX-RU72-0011-R11A-SM-2TF6J", "GTEX-RU72-0011-R11A-SM-5SI8G",]
+	"GTEX-RU72": ["GTEX-RU72-0011-R11A-SM-2TF6J", "GTEX-RU72-0011-R11A-SM-5SI8G"]
 	},
 
 "Cerebellum_RNA_Trimmed":[null],
@@ -63,4 +63,6 @@
 	"GTEX-OHPN": ["GTEX-OHPN-0011-R9A-SM-4DXUH", "GTEX-OHPN-0011-R9A-SM-2YUMN"]
 },
 
-"Substantia_Nigra_RNA_Trimmed":[null]}
+"Substantia_Nigra_RNA_Trimmed":[null]
+
+}
