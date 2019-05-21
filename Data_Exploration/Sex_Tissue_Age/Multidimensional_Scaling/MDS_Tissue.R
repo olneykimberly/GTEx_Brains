@@ -1,9 +1,10 @@
-# This script is for plotting MDS dimensions 1:4.
+# MDS: distances correspond to leading log-fold-changes between each pair of RNA samples.
+# Leading log-fold-change is the average (root-mean-square) of the largest absolute log-foldchanges between each pair of samples.
 
 METADATA = file.path('/scratch/mjpete11/GTEx/', 'Metadata.csv')
 COUNTS = file.path('/scratch/mjpete11/GTEx/Data_Exploration/', 'Count_Matrix.tsv')
-PLOT_DIR = 'Plots/'
-PLOT_FILE = 'Tissue_MDS_Sex_RD.pdf'
+PLOT_DIR = '/scratch/mjpete11/GTEx/Data_Exploration/Sex_Tissue_Age/Multidimensional_Scaling/Plots/'
+PLOT_FILE = 'MDS_Tissue_Plots.pdf'
 
 # Load packages                                                                 
 library(readr)
@@ -14,7 +15,19 @@ library(edgeR)
 
 # Read Metadata CSV.                                                            
 samples = read.csv(METADATA, header = TRUE)
-samples                                                                         
+samples
+
+# Set rownames of metadata object equal to sample names.                        
+rownames(samples) <- samples$Sample                                             
+
+# Read in count matrix
+cts <- read.table(COUNTS, sep="\t")
+
+# Replace . to - in colnames
+colnames(cts) <- str_replace_all(colnames(cts),pattern = "\\.","-")
+
+# Create DGEList object
+y <- DGEList(cts)
 
 # Create every combination of tissue matrices
 # Make list of lists of samples for each tissue
@@ -25,12 +38,6 @@ for(i in 1:length(levels(samples$Tissue))){
 # Rename lists in list as tissue names
 names(tissue_lst) <- levels(samples$Tissue)
 
-# Read in counts 
-cts <- read.csv(COUNTS, sep = "\t")
-
-# Replace . to - in colnames
-colnames(cts) <- str_replace_all(colnames(cts),pattern = "\\.","-")
-
 # List of metadata for each tissue
 meta <- list()
 for(i in 1:length(levels(samples$Tissue))){
@@ -38,305 +45,51 @@ for(i in 1:length(levels(samples$Tissue))){
 }
 names(meta) <- levels(samples$Tissue)
 
-# Make list of data frames of counts from samples per tissue
-count_lst <- list()
+# Get log of count matrix and convert to data frame
+log_cts <- as.data.frame(cpm(y, log=TRUE))
+
+# Split log count df into seperate dfs classified by tissue
+log_count_lst <- list()
 for(i in 1:length(tissue_lst)){
-  count_lst[[i]] <- cts[,which(colnames(cts) %in% tissue_lst[[i]])]
+  log_count_lst[[i]] <- log_cts[,which(colnames(log_cts) %in% tissue_lst[[i]])]
 }
 
-names(count_lst) <- names(tissue_lst)
+names(log_count_lst) <- names(tissue_lst)
 
 # MDS plots
 setwd(PLOT_DIR)
 pdf(PLOT_FILE)
 
-# Plot
-
-# Amygdala dim 1 & 2
+# Plot constants 
 colors <- c("blue", "darkgreen")
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) # Add extra space to right of plot area; change clipping to figure
-plotMDS(count_lst["Amygdala"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], # Assuming colors assigned in alphabetical order; females should be blue
-        main = 'MDS plot dim 1 and 2: Amygdala')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
+par(mar=c(8, 4.1, 4.1, 8), xpd=TRUE) # margins: bottom, left, top, and right
 
-# Amygdala dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) # Add extra space to right of plot area; change clipping to figure
-plotMDS(count_lst["Amygdala"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], # Assuming colors assigned in alphabetical order; females should be blue
-        main = 'MDS plot dim 3 and 4: Amygdala')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
+# MDS plot function for dimensions 1 and 2
+MDS_k2_Fun <- function(x, y) {
+  plots <- plotMDS(x,
+                   top = 1000, 
+                   pch = 16, 
+                   cex = 1, 
+                   dim.plot = c(1,2), 
+                   col = colors[samples$Sex], # Assuming colors assigned in alphabetical order; females should be blue
+                   main = paste('MDS Plot: Dim 1 and 2; ', y))
+           legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors, xpd=TRUE)
+}
 
-# Anterior dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Anterior"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex],
-        main = 'MDS plot dim 1 and 2: Anterior')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
+# MDS plot function for dimensions 3 and 4
+MDS_k4_Fun <- function(x, y) {
+  plots <- plotMDS(x,
+                   top = 1000, 
+                   pch = 16, 
+                   cex = 1, 
+                   dim.plot = c(3,4), 
+                   col = colors[samples$Sex], 
+                   main = paste('MDS Plot: Dim 3 and 4; ', y))
+}
 
-# Anterior dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Anterior"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex],
-        main = 'MDS plot dim 3 and 4: Anterior')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
+# Apply plot function to list of log count dfs
+Map(MDS_k2_Fun, x = log_count_lst, y = names(log_count_lst))
 
-# Caudate dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Caudate"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Caudate')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Caudate dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Caudate"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Caudate')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Frontal Cortex dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Frontal_Cortex"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Frontal Cortex')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Frontal Cortex dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Frontal_Cortex"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Frontal Cortex')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cortex dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Cortex"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Cortex')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cortex dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Cortex"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Cortex')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cerebellar dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Cerebellar"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Cerebellar')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cerebellar dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Cerebellar"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Cerebellar')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cerebellum dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Cerebellum"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Cerebellum')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Cerebellum dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Cerebellum"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Cerebellum')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Hypothalamus dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Hypothalamus"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Hypothalamus')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Hypothalamus dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Hypothalamus"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Hypothalamus')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Hippocampus dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Hippocampus"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Hippocampus')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Hippocampus dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Hippocampus"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Hippocampus')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Substantia Nigra dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Substantia_Nigra"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Substantia Nigra')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Substantia Nigra dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Substantia_Nigra"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Substantia Nigra')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Spinal Cord dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Spinal_Cord"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Spinal Cord')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Spinal Cord dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Spinal_Cord"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Spinal Cord')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Nucleus Accumbens dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Nucleus_Accumbens"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Nucleus Accumbens')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Nucleus Accumbens dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Nucleus_Accumbens"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Nucleus Accumbens')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Putamen dim 1 & 2
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plotMDS(count_lst["Putamen"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(1,2), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 1 and 2: Putamen')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
-
-# Putamen dim 3 & 4
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE) 
-plotMDS(count_lst["Putamen"][[1]], 
-        top = 1000, 
-        pch = 16, 
-        cex = 1, 
-        dim.plot = c(3,4), 
-        col = colors[samples$Sex], 
-        main = 'MDS plot dim 3 and 4: Putamen')
-legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors)
+Map(MDS_k4_Fun, x = log_count_lst, y = names(log_count_lst))
 
 dev.off()
