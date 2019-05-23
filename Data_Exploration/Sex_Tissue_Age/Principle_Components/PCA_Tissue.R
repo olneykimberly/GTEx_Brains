@@ -90,7 +90,7 @@ names(PCA) <- names(Meta)
 
 # PCA plots
 setwd(PLOT_DIR)
-pds(FILE_NAME)
+pdf(FILE_NAME)
 
 # Function to plot PCA for dimensions 1 and 2, color and shape by sex.
 colors <- c("blue", "darkgreen")
