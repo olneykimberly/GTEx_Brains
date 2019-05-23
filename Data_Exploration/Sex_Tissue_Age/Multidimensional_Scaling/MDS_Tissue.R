@@ -85,6 +85,7 @@ MDS_k4_Fun <- function(x, y) {
                    dim.plot = c(3,4), 
                    col = colors[samples$Sex], 
                    main = paste('MDS Plot: Dim 3 and 4; ', y))
+           legend("topright", inset=c(-0.2,0), legend=levels(samples$Sex), pch=16, cex=1,col=colors, xpd=TRUE)
 }
 
 # Apply plot function to list of log count dfs
