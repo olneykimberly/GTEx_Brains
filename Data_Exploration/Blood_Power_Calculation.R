@@ -28,20 +28,19 @@ All_GTEx_IDs <- sapply(Map_Lst, '[[', 9)
 SRA_Whole_Blood %in% All_GTEx_IDs # TRUE
 
 # Get whole blood GTEx IDs
-GTEx_Whole_Blood <- names(All_GTEx_IDs[(which(SRA_Whole_Blood %in% All_GTEx_IDs))])
+# Order matters for %in% command. The returned boolean vector will be relative to the first in order 
+GTEx_Whole_Blood_Wrong_Index <- names(All_GTEx_IDs[(which(SRA_Whole_Blood %in% All_GTEx_IDs))]) # Returns SRA_Whole_Blood index
+
+GTEx_Whole_Blood <- names(All_GTEx_IDs[(which(All_GTEx_IDs %in% SRA_Whole_Blood))]) # Returns All_GTEx_IDs index
  
 # Make table
 Tmp_Mat <- rbind(Meta[,1:2], cbind(Sample=GTEx_Whole_Blood,Tissue="Blood")) # Drop 'Age' and 'Sex' columns
 
 Tmp_Mat$Sample <- str_extract(Tmp_Mat$Sample,"GTEX-[0-9A-Z]+") # Filter for only individual ID
 
-Unique_Mat <- unique(Tmp_Mat)
-
-Sample_Tble <- as.data.frame.matrix(table(Unique_Mat))
-
-Compare_Tble <- as.data.frame.matrix(table(Tmp_Mat)) # Without filtering for unique IDs
+Sample_Tble <- as.data.frame.matrix(table(Tmp_Mat))
 
 # Write to file
-write.csv(Compare_Tble, file = FILE_NAME)
+write.csv(Sample_Tble, file = FILE_NAME)
 
 
