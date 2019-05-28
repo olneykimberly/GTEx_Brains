@@ -1,7 +1,7 @@
 # This script is for plotting PCA dimensions 1:4 for the top 1000 most variable gene per tissue.
 
-METADATA = file.path("/scratch/mjpete11/GTEx/", "Metadata.csv")
-COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Count_Matrix.tsv")
+METADATA = file.path("/scratch/mjpete11/GTEx/", "Toy_Metadata.csv")
+COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Toy_Count_Matrix.tsv")
 PLOT_DIR = "/scratch/mjpete11/GTEx/Data_Exploration/Sex_Tissue_Age/Principle_Components/Tissue_Plots/"
 FILE_NAME = "PCA_Tissue"
 
@@ -13,7 +13,6 @@ library(dplyr)
 
 # Read Metadata CSV.                                                            
 Samples = read.csv(METADATA, header = TRUE)
-Samples                                                                         
 
 # Create every combination of tissue matrices
 # Make list of lists of samples for each tissue
@@ -28,7 +27,7 @@ names(Tissue_Lst) <- levels(Samples$Tissue)
 cts <- read.csv(COUNTS, sep = "\t")
 
 # Replace . to - in colnames
-colnames(cts) <- str_replace_all(colnames(cts),pattern = "\\.","-")
+colnames(cts) <- str_replace_all(colnames(cts), pattern = "\\.","-")
 
 # Filter for most variable genes
 Var_Genes <- apply(cts, 1, var) # 1 is to  set margin to rows
@@ -38,7 +37,7 @@ Select_Var <- names(sort(Var_Genes, decreasing=TRUE)[1:1000])
 
 # Subset the most variable genes
 Highly_Variable_CPM <- cts[Select_Var,]
-dim(Highly_Variable_CPM) # 1000 130
+dim(Highly_Variable_CPM)
 
 # Create list of data frames containing counts for each tissue
 Var_Count <- list()
@@ -50,7 +49,7 @@ for(i in 1:length(Tissue_Lst)){
 Var_Count <- lapply(Var_Count, t)
 
 # Rename lists in list
-names(Var_Count) <- paste("count_",names(Tissue_Lst),sep="")
+names(Var_Count) <- paste("count_", names(Tissue_Lst), sep="")
 
 # Euclidean distances between the rows
 Count_Dist <- lapply(Var_Count, dist)
@@ -135,3 +134,4 @@ PCA_k4_Age <- function(a, b){
 Map(PCA_k4_Age, a = PCA, b = names(PCA))
 
 dev.off()
+
