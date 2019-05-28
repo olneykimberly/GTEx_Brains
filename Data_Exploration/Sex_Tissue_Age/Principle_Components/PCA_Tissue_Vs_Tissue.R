@@ -1,7 +1,7 @@
 # This script is for plotting PCA dimensions 1:4 for the top 1000 most variable genes in a tissue vs tissue approach.
 
-METADATA = file.path("/scratch/mjpete11/GTEx/", "Metadata.csv")
-COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Count_Matrix.tsv")
+METADATA = file.path("/scratch/mjpete11/GTEx/", "Toy_Metadata.csv")
+COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Toy_Count_Matrix.tsv")
 PLOT_DIR = "PCA_Tissue_Vs_Tissue_Plots/"
 FILE_NAME = "PCA_Tissue_Vs_Tissue.pdf"
 
@@ -37,7 +37,7 @@ Select_Var <- names(sort(Var_Genes, decreasing=TRUE)[1:1000])
 
 # Subset the most variable genes
 Highly_Variable_CPM <- cts[Select_Var,]
-dim(Highly_Variable_CPM)
+dim(Highly_Variable_CPM) 
 
 # Create list of data frames containing counts for each tissue
 Var_Count_Lst <- list()
@@ -62,44 +62,35 @@ for(i in 1:ncol(Combos)){
 Combo_Dist <- lapply(Combo_Count, dist)
 
 # Calculate PCA
-Tit <- lapply(Combo_Dist, function(y){
+Fit <- lapply(Combo_Dist, function(y){
   cmdscale(y, eig=T, k=4) # Set number of dimensions
 })
 
 # Add metadata to PCA data
 # Get metadata for each tissue and store dataframes in list
-Meta <- list()
-for(i in 1:length(levels(Samples$Tissue))){
-  Meta[[i]] <- samples[Samples$Tissue == levels(Samples$Tissue)[i],]
-}
+Meta <- lapply(levels(Samples$Tissue), function(x){
+  data.frame(Samples[which(Samples$Tissue==x),])
+})
 names(Meta) <- levels(Samples$Tissue)
-
-# Create list of metadata of each tissue combination
-Combos <- combn(1:length(levels(Samples$Tissue)),m = 2,simplify = T)
-Meta_lst <- list()
-for(i in 1:ncol(Combos)){
-  Meta_Lst[[i]] <- rbind(Meta[[Combos[,i][1]]], Meta[[Combos[,i][2]]])
-  names(Meta_Lst)[i] <- paste(names(Meta)[c(Combos[,i])], collapse = "-")
-}
 
 # Merge metadata and PCA data into single dataframe
 # e.g. combine two lists of dataframes into a list of merged pairs of dfs
 PCA <- list()
 for(i in 1:length(Fit)){
   # make data frame with samples as a column
-  tmpA <- data.frame(Sample=rownames(Fit[[i]][[1]]),Fit[[i]][[1]])
+  tmpA <- data.frame(Sample=rownames(Fit[[i]][[1]]), Fit[[i]][[1]])
   # save meta as a tmp dataframe
-  tmpB <- Meta_Lst[[i]]
+  tmpB <- Meta[[i]]
   # refactor tmpB data frame to avoid errors
   tmpB$Sample <- factor(tmpB$Sample)
   # join tables together by samples name
   PCA[[i]] <- left_join(tmpA,tmpB)
   # match unnamed columns
-  tmpC <- str_which(colnames(PCA[[i]]),pattern = "^[A-Z][0-9]+")
+  tmpC <- str_which(colnames(PCA[[i]]) ,pattern = "^[A-Z][0-9]+")
   # rename columns
   colnames(PCA[[i]])[tmpC] <- paste("Dim_", 1:length(tmpC), sep = "")
 }
-names(PCA) <- names(Meta_Lst)
+names(PCA) <- names(Meta)
 
 # PCA plots
 setwd(PLOT_DIR)
@@ -148,6 +139,33 @@ Map(PCA_k4_Age, a = PCA, b = names(PCA))
 
 dev.off()
 
+#########################################################################
 
+# Combine into one function
 
+# Function to plot PCA for dimensions 1 and 2, color by tissue and shape by sex
+Colors <- c("blue", "darkgreen")
+Shapes <-  c(21,22)
+
+PCA_Sex <- function(DF_Lst, DF_Names, Dim_A, Dim_B ){
+ ggplot(DF_Lst, aes(x=Dim_A, y=Dim_B, shape=Tissue, color=Sex, label=Tissue)) +
+    geom_point(size=2, aes(fill = Sex)) + ggtitle(paste("PCA plot", DF_Names, sep = " : " )) +
+    scale_shape_manual(values=Shapes) + scale_color_manual(values=Colors) +
+    scale_fill_manual(values=Colors)  
+  
+}
+
+for( i in 1:length(PCA)){
+  print(PCA_Sex(DF_Lst=PCA[[i]], DF_Names=names(PCA[i]), Dim_A=PCA[[i]]$Dim_1, Dim_B=PCA[[i]]$Dim_2))
+}
+
+lapply(PCA,function(x){
+  PCA_Sex(DF_Lst=x, DF_Names=names(x), Dim_A=x$Dim_1, Dim_B=x$Dim_2)
+})
+
+Map(PCA_Sex, DF_Lst=PCA, DF_Names=names(PCA), Dim_A=Dim_1, Dim_B=Dim_2)
+
+Map(PCA_Sex, DF_Lst=PCA, DF_Names=names(PCA), Dim_A=Dim_3, Dim_B=Dim_4)
+
+PCA_Sex(DF_Lst=PCA, DF_Names=names(PCA), Dim_A=Dim_3, Dim_B=Dim_4)
 
