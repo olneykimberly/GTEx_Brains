@@ -20,8 +20,8 @@ SAMPLES = XX_SAMPLES + XY_SAMPLES
 
 rule all:
     input:
-        expand("bams/{sample}_GRCh38.sorted.bam", sample=SAMPLES)
-
+        expand("stringtie_results/{sample}/{sample}_GRCh38.fully_covered_transcripts.secondpass.gtf", sample=SAMPLES)
+        
 rule hisat2_align_reads:
     input:
         paired_1 = "/scratch/mjpete11/GTEx/Anterior/Quality_Control/trimmed_fastqs/{sample}_trimmomatic_trimmed_paired_1.fastq.gz",
@@ -53,9 +53,9 @@ rule hisat2_align_reads:
 rule stringtie_first_pass:
     input:
         bam = "bams/{sample}_GRCh38.sorted.bam",
-        gff = "/scratch/mjpete11/gencode.v29.annotation.gtf"
+        gff = "/scratch/mjpete11/GTEx/gencode.v29.annotation.gtf"
     output:
-        "stringtie_results/{sample}/{sample}_GRCh38.assembled_traanscripts.firstpass.gtf"
+        "stringtie_results/{sample}/{sample}_GRCh38.assembled_transcripts.firstpass.gtf"
     threads: 4 # Look up diff between this and threads = 4
     params:
         stringtie = STRINGTIE_PATH,
@@ -63,4 +63,49 @@ rule stringtie_first_pass:
     shell:
         "{params.stringtie} {input.bam} -o {output} -p {params.threads} "
         "-G {input.gff}"
+
+rule create_stringtie_merged_list:
+    input: 
+         expand("stringtie_results/{sample}/{sample}_GRCh38.assembled_transcripts.firstpass.gtf", sample = SAMPLES)
+    output: 
+        "stringtie_results/GRCh38_gtflist.txt"
+    run:
+        shell("echo -n > {output}")
+        for i in input:
+            shell("echo {} >> {{output}}".format(i))
+
+rule stringtie_merge:
+    input: 
+        stringtie_list = "stringtie_results/GRCh38_gtflist.txt",
+        gff = "/scratch/mjpete11/GTEx/gencode.v29.annotation.gtf"
+    output:
+        "stringtie_results/GRCh38.merged.gtf"
+    threads: 4
+    params:
+        stringtie = STRINGTIE_PATH, 
+        threads = 4
+    shell:
+        "{params.stringtie} --merge {input.stringtie_list} -o {output} "
+        "-p {params.threads} -G {input.gff}"
+       
+       
+rule stringtie_second_pass:
+    input: 
+        bam = "bams/{sample}_GRCh38.sorted.bam",
+        gff = "stringtie_results/GRCh38.merged.gtf"
+    output:
+        assembled_transcripts = "stringtie_results/sample_{sample}/{sample}_GRCh38.assembled_transcripts.secondpass.gtf",
+        gene_abundances = "stringtie_results/{sample}_GRCh38.gene_abundances.secondpass.txt",
+        fully_covered_transcripts = "stringtie_results/{sample}/{sample}_GRCh38.fully_covered_transcripts.secondpass.gtf"
+    threads: 4
+    params:
+        stringtie = STRINGTIE_PATH,
+        threads = 4
+    shell:
+        "{params.stringtie} {input.bam} -p {params.threads} "
+        "-G {input.gff} -B -e "
+        "-o {output.assembled_transcripts} "
+        "-A {output.gene_abundances} "
+        "-C {output.fully_covered_transcripts}"
+
 
