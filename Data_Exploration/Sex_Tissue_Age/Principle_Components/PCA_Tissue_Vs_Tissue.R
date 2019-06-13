@@ -1,7 +1,7 @@
 # This script is for plotting PCA dimensions 1:4 for the top 1000 most variable genes in a tissue vs tissue approach.
 
-METADATA = file.path("/scratch/mjpete11/GTEx/", "Metadata.csv")
-COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Count_Matrix.tsv")
+METADATA = file.path("/scratch/mjpete11/GTEx/", "Toy_Metadata.csv")
+COUNTS = file.path("/scratch/mjpete11/GTEx/Data_Exploration/", "Toy_Count_Matrix.tsv")
 PLOT_DIR = "PCA_Tissue_Vs_Tissue_Plots/"
 FILE_NAME = "PCA_Tissue_Vs_Tissue.pdf"
 
@@ -62,16 +62,15 @@ for(i in 1:ncol(Combos)){
 Combo_Dist <- lapply(Combo_Count, dist)
 
 # Calculate PCA
-Tit <- lapply(Combo_Dist, function(y){
+Fit <- lapply(Combo_Dist, function(y){
   cmdscale(y, eig=T, k=4) # Set number of dimensions
 })
 
 # Add metadata to PCA data
 # Get metadata for each tissue and store dataframes in list
-Meta <- list()
-for(i in 1:length(levels(Samples$Tissue))){
-  Meta[[i]] <- samples[Samples$Tissue == levels(Samples$Tissue)[i],]
-}
+Meta <- lapply(levels(Samples$Tissue), function(x){
+  data.frame(Samples[which(Samples$Tissue==x),])
+})
 names(Meta) <- levels(Samples$Tissue)
 
 # Create list of metadata of each tissue combination
@@ -87,19 +86,19 @@ for(i in 1:ncol(Combos)){
 PCA <- list()
 for(i in 1:length(Fit)){
   # make data frame with samples as a column
-  tmpA <- data.frame(Sample=rownames(Fit[[i]][[1]]),Fit[[i]][[1]])
+  tmpA <- data.frame(Sample=rownames(Fit[[i]][[1]]), Fit[[i]][[1]])
   # save meta as a tmp dataframe
-  tmpB <- Meta_Lst[[i]]
+  tmpB <- Meta[[i]]
   # refactor tmpB data frame to avoid errors
   tmpB$Sample <- factor(tmpB$Sample)
   # join tables together by samples name
   PCA[[i]] <- left_join(tmpA,tmpB)
   # match unnamed columns
-  tmpC <- str_which(colnames(PCA[[i]]),pattern = "^[A-Z][0-9]+")
+  tmpC <- str_which(colnames(PCA[[i]]) ,pattern = "^[A-Z][0-9]+")
   # rename columns
   colnames(PCA[[i]])[tmpC] <- paste("Dim_", 1:length(tmpC), sep = "")
 }
-names(PCA) <- names(Meta_Lst)
+names(PCA) <- names(Meta)
 
 # PCA plots
 setwd(PLOT_DIR)
@@ -111,18 +110,18 @@ shapes <-  c(21,22)
 
 PCA_k2_Sex <- function(a, b){
   Plot_k2_Sex <- ggplot(a, aes(x=Dim_1, y=Dim_2, shape=Tissue, color=Sex, label=Tissue)) +
-    geom_point(size=2, aes(fill = Sex)) + ggtitle(paste("PCA plot", b, sep = " : " )) +
-    scale_shape_manual(values=shapes) + scale_color_manual(values=colors) +
-    scale_fill_manual(values=colors)  
+                 geom_point(size=2, aes(fill = Sex)) + ggtitle(paste("PCA plot", b, sep = " : " )) +
+                 scale_shape_manual(values=shapes) + scale_color_manual(values=colors) +
+                 scale_fill_manual(values=colors)  
 }
 
 Map(PCA_k2_Sex, a = PCA, b = names(PCA))
 
 # Function to plot PCA for dimensions 1 and 2, color by age and shape by tissue
 PCA_k2_Age <- function(a, b){
-  Plot_k2_Age <- ggplot(a, aes(x=Dim_1, y=Dim_2, color=Age, shape=Tissue, label=Tissue)) +
-    geom_point(size=2) + ggtitle(paste("PCA plot", b, sep = " : " )) + 
-    scale_color_gradient(low="black", high="lightblue")
+    Plot_k2_Age <- ggplot(a, aes(x=Dim_1, y=Dim_2, color=Age, shape=Tissue, label=Tissue)) +
+                   geom_point(size=2) + ggtitle(paste("PCA plot", b, sep = " : " )) + 
+                   scale_color_gradient(low="black", high="lightblue")
 }
 
 Map(PCA_k2_Age, a = PCA, b = names(PCA))
@@ -130,9 +129,9 @@ Map(PCA_k2_Age, a = PCA, b = names(PCA))
 # Function to plot PCA for dimensions 3 and4, color by tissue and shape by sex
 PCA_k4_Sex <- function(a, b){
   Plot_k4_Sex <- ggplot(a, aes(x=Dim_3, y=Dim_4, shape=Tissue, color=Sex, label=Tissue)) +
-    geom_point(size=2, aes(fill = Sex)) + ggtitle(paste("PCA plot", b, sep = " : " )) +
-    scale_shape_manual(values=shapes) + scale_color_manual(values=colors) +
-    scale_fill_manual(values=colors)  
+                 geom_point(size=2, aes(fill = Sex)) + ggtitle(paste("PCA plot", b, sep = " : " )) +
+                 scale_shape_manual(values=shapes) + scale_color_manual(values=colors) +
+                 scale_fill_manual(values=colors)  
 }
 
 Map(PCA_k4_Sex, a = PCA, b = names(PCA))
@@ -140,10 +139,12 @@ Map(PCA_k4_Sex, a = PCA, b = names(PCA))
 # Function to plot PCA for dimensions 1 and 2, color by age and shape by tissue
 PCA_k4_Age <- function(a, b){
   Plot_k4_Age <- ggplot(a, aes(x=Dim_3, y=Dim_4, color=Age, shape=Tissue, label=Tissue)) +
-    geom_point(size=2) + ggtitle(paste("PCA plot", b, sep = " : " )) + 
-    scale_color_gradient(low="black", high="lightblue")
+                 geom_point(size=2) + ggtitle(paste("PCA plot", b, sep = " : " )) + 
+                 scale_color_gradient(low="black", high="lightblue")
 }
 
 Map(PCA_k4_Age, a = PCA, b = names(PCA))
 
 dev.off()
+
+
