@@ -3,6 +3,10 @@
 library(dplyr)
 library(ggplot2)
 
+# Constants
+PLOT_DIR <- "/scratch/mjpete11/GTEx/Data_Exploration/Hist/"
+PLOT_NAME <- "Age_Histograms.pdf"
+
 # Read Metadata CSV.                                                            
 Samples = read.csv(file.path("/scratch/mjpete11/GTEx/Metadata/", "Metadata.csv"), header = TRUE)
 Samples                                                                         
@@ -38,24 +42,30 @@ for(i in 1:length(levels(Samples$Tissue))){
 }
 names(Meta) <- levels(Samples$Tissue)
 
-
-# Histograms of age distribution by sex
+# X lims
 max(Samples$Age) # 70
 min(Samples$Age) # 20
 
-# Function to plot histograms
+# Histogram plots
+setwd(PLOT_DIR)
+pdf(PLOT_NAME)
+
 x_axis_labels <- seq(min(Samples[,'Age']), max(Samples[,'Age']), 5)
 y_axis_labels <- seq(0, 30, 1)
 
 Hist_Func <- function(a, b){
   Hist_Plots <- ggplot(a, aes(x=Age, fill=Sex)) +
-                geom_histogram(binwidth=1, alpha=0.8, colour="gray50") + 
-                scale_x_continuous(labels = x_axis_labels, breaks = x_axis_labels) + # Include all tick marks including value
-                scale_y_continuous(labels = y_axis_labels, breaks = y_axis_labels) +
-                scale_fill_manual(name = "Sex", values=c("blue", "green")) +
-                ggtitle(paste(b, "Sample Age Histogram")) +
-                xlab("Age") + ylab("Count")
+    geom_histogram(data=subset(a, Sex=='Female'), aes(fill=Sex), alpha=0.4, binwidth=1, colour='gray50') +
+    geom_histogram(data=subset(a, Sex=='Male'), aes(fill=Sex), alpha=0.4, binwidth=1, colour='gray50') + 
+    scale_x_continuous(labels=x_axis_labels, breaks=x_axis_labels) +
+    scale_y_continuous(labels=y_axis_labels, breaks=y_axis_labels) +
+    scale_fill_manual(name="Sex", values=c("blue", "green"), labels=c("Female", "Male")) +
+    ggtitle(paste(b, "Sample Age Histogram")) +
+    xlab("Age") + ylab("Count") 
 }
 
 Map(Hist_Func, a = Meta, b = names(Meta))
+
+dev.off()
+
 
