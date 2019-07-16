@@ -1,3 +1,0 @@
-*quant.sf filter=lfs diff=lfs merge=lfs -text
-*.html filter=lfs diff=lfs merge=lfs -text
-*.gtf filter=lfs diff=lfs merge=lfs -text
